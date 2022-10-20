@@ -2,28 +2,19 @@
     text-align: center;
     padding: 20px;
     color: white;
+    position: relative;
 }
 
-.grid {
-    height: 500px;
-    overflow-y: scroll;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
-    place-items: start;
-    row-gap: 2px;
-    column-gap: 2px;
-    border: solid gray 10px;
-    padding: 10px;
-}
-
-.grid > * {
-    background: orange;
-    width: 100%;
+.row {
+    display: flex;
+    gap: 1px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    justify-content: center;
 }
 
 .item {
-    height: 0;
-    padding-top: 100%;
+    cursor: pointer;
 }
 
 .flex {
@@ -31,6 +22,12 @@
     justify-content: center;
     align-items: center;
     margin: 20px 0;
+    gap: 5px;
+}
+
+.inline-flex {
+    display: flex;
+    align-items: center;
     gap: 5px;
 }
 
@@ -56,4 +53,47 @@ button:active {
     background-color: #3e8e41;
     box-shadow: 0 0px #666;
     transform: translateY(5px);
+}
+
+.settings {
+    position: absolute;
+    top: 200px;
+    left: 50%;
+    margin-left: 240px;
+    text-align: left;
+    max-width: 260px;
+    min-width: 260px;
+}
+
+@media only screen and (max-width: 1023px) {
+    .settings {
+        position: relative;
+        top: 15px;
+        left: 0;
+        right: 0;
+        margin: auto;
+        text-align: center;
+    }
+
+    .settings > * {
+        justify-content: center;
+    }
+}
+
+select {
+    height: 25px;
+    padding: 2px;
+    border-radius: 5px;
+    border: none;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0;
+    }
+}
+
+.blink {
+    text-transform: uppercase;
+    animation: blinker 1.5s ease-in-out infinite;
 }
