@@ -129,24 +129,52 @@ function App() {
         return false;
     }
 
+    function generateShortestPath(coordinates: string[]) {
+        const newArr = [...grid];
+        coordinates.forEach((coordinate) => {
+            const [row, col] = coordinate
+                .split(',')
+                .map((string) => parseInt(string));
+            const newArr = [...grid];
+
+            const rawCoordinate = `${row},${col}`;
+            newArr[row][col] = `${rawCoordinate},s`;
+        });
+
+        setGrid(newArr);
+    }
+
     async function bfs(row: number, col: number): Promise<void> {
-        const q = [grid[row][col]];
+        const q: [{ coordinate: string; past: string[] }] = [
+            { coordinate: grid[row][col], past: [] },
+        ];
 
         while (q.length > 0) {
             let current = q.shift();
             if (!current) return;
 
-            if (current.includes('w')) continue;
+            let { coordinate, past } = current;
 
-            const [row, col] = current
+            if (!coordinate) return;
+
+            if (coordinate.includes('w')) continue;
+
+            const [row, col] = coordinate
                 .split(',')
                 .map((string) => parseInt(string));
 
-            if (visited.has(current)) continue;
-            visited.add(current);
-            handleAddVisited(current);
+            const rawCoordinate = `${row},${col}`;
 
-            if (current.includes('e')) return;
+            if (visited.has(coordinate)) continue;
+            visited.add(coordinate);
+            handleAddVisited(coordinate);
+
+            if (coordinate.includes('e')) {
+                past = [...past, rawCoordinate];
+                generateShortestPath(past);
+
+                return;
+            }
 
             if (delayRef.current?.valueAsNumber) {
                 const delayMS = Math.abs(100 - delayRef.current.valueAsNumber);
@@ -157,19 +185,32 @@ function App() {
             }
 
             // col
+
             if (col > 0) {
-                q.push(grid[row][col - 1]);
+                q.push({
+                    coordinate: grid[row][col - 1],
+                    past: [...past, rawCoordinate],
+                });
             }
             if (col < grid[row]?.length - 1) {
-                q.push(grid[row][col + 1]);
+                q.push({
+                    coordinate: grid[row][col + 1],
+                    past: [...past, rawCoordinate],
+                });
             }
 
             // row
             if (row > 0) {
-                q.push(grid[row - 1][col]);
+                q.push({
+                    coordinate: grid[row - 1][col],
+                    past: [...past, rawCoordinate],
+                });
             }
             if (row < grid.length - 1) {
-                q.push(grid[row + 1][col]);
+                q.push({
+                    coordinate: grid[row + 1][col],
+                    past: [...past, rawCoordinate],
+                });
             }
         }
     }
@@ -185,13 +226,13 @@ function App() {
     }
 
     async function handleReset(): Promise<void> {
-        delayRef.current!.valueAsNumber = 0; // let the traversal finish
+        delayRef.current!.valueAsNumber = 100; // let the traversal finish
 
         await delay(50);
         setVisited(new Set());
         generateGrid(size, size, start, end, setGrid);
 
-        delayRef.current!.valueAsNumber = 50;
+        delayRef.current!.valueAsNumber = 80;
     }
 
     function handleGridInput(e: React.ChangeEvent<HTMLSelectElement>): void {
@@ -230,14 +271,20 @@ function App() {
                     style={{ marginTop: '-15px', marginBottom: '5px' }}
                 >
                     <p>Speed: </p>
-                    <input ref={delayRef} type="range" />
+                    <input defaultValue={80} ref={delayRef} type="range" />
                 </div>
+                <p style={{ marginTop: 0 }}>
+                    If not choosing the START / END tile, you can click the
+                    tiles to create a barrier.
+                </p>
                 <div>
                     <button
+                        className="start"
                         onClick={() => {
-                            if (!isChoosingEnd) {
-                                setIsChoosingStart(true);
+                            if (isChoosingEnd) {
+                                setIsChoosingEnd(false);
                             }
+                            setIsChoosingStart(true);
                         }}
                     >
                         Set Start Tile
@@ -245,11 +292,12 @@ function App() {
                 </div>
                 <div style={{ marginTop: '20px' }}>
                     <button
-                        className="danger"
+                        className="end"
                         onClick={() => {
-                            if (!isChoosingStart) {
-                                setIsChoosingEnd(true);
+                            if (isChoosingStart) {
+                                setIsChoosingStart(false);
                             }
+                            setIsChoosingEnd(true);
                         }}
                     >
                         Set End Tile

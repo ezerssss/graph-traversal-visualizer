@@ -12,11 +12,13 @@ interface PropsInterface {
 function BoxItem(props: PropsInterface) {
     const { coordinate, isVisited, size, onVisited } = props;
     const isBlocker = coordinate.includes('w');
-    const regularTile =
-        isVisited || coordinate.includes('e') ? 'red' : 'orange';
+    const regularTile = isVisited ? 'red' : 'orange';
+    const isEndTile = coordinate.includes('e');
     const isStartTile = coordinate.includes('s');
     const backgroundColor = isStartTile
         ? 'green'
+        : isEndTile
+        ? 'blue'
         : isBlocker
         ? 'gray'
         : regularTile;

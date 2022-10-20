@@ -97,3 +97,11 @@ select {
     text-transform: uppercase;
     animation: blinker 1.5s ease-in-out infinite;
 }
+
+.start {
+    background-color: green;
+}
+
+.end {
+    background-color: blue;
+}
